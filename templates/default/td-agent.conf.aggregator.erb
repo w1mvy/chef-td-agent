@@ -1,0 +1,102 @@
+#
+# Fluentd log aggregators conf
+#
+<source>
+  type forward
+  port <%= node['td_agent']['aggregator_port'] %>
+</source>
+
+<match nginx.**>
+  type copy
+  <store>
+    type forest
+    subtype s3
+    <template>
+      format_json      true
+      include_time_key true
+      store_as         gzip
+      time_slice_format y=%Y/m=%m/d=%d/%Y%m%dT%H
+      s3_object_key_format production/${tag}/%{time_slice}_%{index}_${hostname}.js.%{file_extension}
+
+      aws_key_id  <%= node['td_agent']['aws_key_id'] %>
+      aws_sec_key <%= node['td_agent']['aws_sec_key'] %>
+      s3_endpoint <%= node['td_agent']['s3_endpoint'] %>
+      s3_bucket   <%= node['td_agent']['s3_bucket'] %>
+
+      flush_interval  10m
+      buffer_path /var/log/td-agent/s3/${tag}/buffer
+      buffer_chunk_limit 1g
+      retry_wait 30s
+      retry_limit 5
+      flush_at_shutdown true
+    </template>
+  </store>
+  <store>
+    type forward
+    heartbeat_type tcp
+    buffer_type file
+    buffer_chunk_limit 8m
+    buffer_queue_limit 128
+    buffer_path /var/log/td-agent/buffer/nginx_access_log
+    flush_interval 1s
+    <server>
+      name <%= node['td_agent']['nginx_access_name'] %>
+      host <%= node['td_agent']['nginx_aggregator_host'] %>
+      port <%= node['td_agent']['nginx_aggregator_port'] %>
+    </server>
+  </store>
+</match>
+
+<match app.**>
+  type copy
+  <store>
+    type forest
+    subtype s3
+    <template>
+      format_json      true
+      include_time_key true
+      store_as         gzip
+      time_slice_format y=%Y/m=%m/d=%d/%Y%m%dT%H
+      s3_object_key_format production/${tag}/%{time_slice}_%{index}_${hostname}.js.%{file_extension}
+
+      aws_key_id  <%= node['td_agent']['aws_key_id'] %>
+      aws_sec_key <%= node['td_agent']['aws_sec_key'] %>
+      s3_endpoint <%= node['td_agent']['s3_endpoint'] %>
+      s3_bucket   <%= node['td_agent']['s3_bucket'] %>
+
+      flush_interval  10m
+      buffer_path /var/log/td-agent/s3/${tag}/buffer
+      buffer_chunk_limit 1g
+      retry_wait 30s
+      retry_limit 5
+      flush_at_shutdown true
+    </template>
+  </store>
+</match>
+
+<match fluent.**>
+  type copy
+  <store>
+    type forest
+    subtype s3
+    <template>
+      format_json      true
+      include_time_key true
+      store_as         gzip
+      time_slice_format y=%Y/m=%m/d=%d/%Y%m%dT%H
+      s3_object_key_format production/${tag}/%{time_slice}_%{index}_${hostname}.js.%{file_extension}
+
+      aws_key_id  <%= node['td_agent']['aws_key_id'] %>
+      aws_sec_key <%= node['td_agent']['aws_sec_key'] %>
+      s3_endpoint <%= node['td_agent']['s3_endpoint'] %>
+      s3_bucket   <%= node['td_agent']['s3_bucket'] %>
+
+      flush_interval  10m
+      buffer_path /var/log/td-agent/s3/${tag}/buffer
+      buffer_chunk_limit 1g
+      retry_wait 30s
+      retry_limit 5
+      flush_at_shutdown true
+    </template>
+  </store>
+</match>

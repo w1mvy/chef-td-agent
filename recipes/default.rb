@@ -47,9 +47,17 @@ when "centos", "redhat"
   end
 end
 
-template "/etc/td-agent/td-agent.conf" do
-  mode "0644"
-  source "td-agent.conf.erb"
+case node['td_agent']['server_type']
+when 'forwarder'
+  template "/etc/td-agent/td-agent.conf" do
+    mode "0644"
+    source "td-agent.conf.forwarder.erb"
+  end
+when 'aggregator'
+  template "/etc/td-agent/td-agent.conf" do
+    mode "0644"
+    source "td-agent.conf.aggregator.erb"
+  end
 end
 
 if node['td_agent']['includes']
