@@ -40,7 +40,7 @@
     buffer_path /var/log/td-agent/buffer/nginx_access_log
     flush_interval 1s
     <server>
-      name <%= node['td_agent']['nginx_access_name'] %>
+      name <%= node['td_agent']['nginx_aggregator_server_name'] %>
       host <%= node['td_agent']['nginx_aggregator_host'] %>
       port <%= node['td_agent']['nginx_aggregator_port'] %>
     </server>
