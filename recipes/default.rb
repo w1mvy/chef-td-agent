@@ -54,6 +54,7 @@ when 'forwarder'
     source "td-agent.conf.forwarder.erb"
   end
 when 'aggregator'
+  node.default['td_agent']['plugins'] = ["forest"]
   template "/etc/td-agent/td-agent.conf" do
     mode "0644"
     source "td-agent.conf.aggregator.erb"
